@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GorillaKZ.Behaviours;
 using System.Text;
 
-namespace GorillaKZ
+namespace GorillaKZ.Models
 {
 	public class RunCollection
 	{
@@ -37,7 +36,7 @@ namespace GorillaKZ
 
 				int place = i + offset;
 
-				if (run.Runner == GorillaKZManager.username) text.StartColor("00D700");
+				if (run.Runner == GorillaKZManager.instance.Username) text.StartColor("00D700");
 				else if (place == 1) text.StartColor("FFD700");
 				else if (place == 2) text.StartColor("C0C0C0");
 				else if (place == 3) text.StartColor("CD7F32");
@@ -47,7 +46,7 @@ namespace GorillaKZ
 				// TODO: This breaks with over 59 minutes
 				text.Append(run.Time.ToString("mm\\:ss\\.fff"));
 
-				if (place <= 3 || run.Runner == GorillaKZManager.username) text.EndColor();
+				if (place <= 3 || run.Runner == GorillaKZManager.instance.Username) text.EndColor();
 			}
 
 			return text.ToString();

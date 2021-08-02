@@ -1,8 +1,6 @@
-﻿using System;
-using BepInEx;
-using UnityEngine;
+﻿using BepInEx;
+using GorillaKZ.Behaviours;
 using GorillaLocomotion;
-using HarmonyLib;
 
 namespace GorillaKZ
 {

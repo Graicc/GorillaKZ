@@ -1,22 +1,25 @@
-﻿using System;
+﻿using GorillaKZ.Models;
+using Newtonsoft.Json;
+using Photon.Pun;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using WebSocketSharp;
-using UnityEngine;
-using VmodMonkeMapLoader;
-using Newtonsoft.Json;
-using System.Text;
 using System.Security.Cryptography;
-using Photon.Pun;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using UnityEngine;
+using VmodMonkeMapLoader;
+using WebSocketSharp;
 
-namespace GorillaKZ
+namespace GorillaKZ.Behaviours
 {
-	public static class BackendInterface
+	public class BackendInterface : MonoBehaviour
 	{
+		public static BackendInterface instance;
+
 #if DEBUG
 		const string urlBase = @"localhost:5000";
 #else
@@ -24,7 +27,7 @@ namespace GorillaKZ
 #endif
 
 		static HttpClient client = new HttpClient();
-		static WebSocket socket;
+		static WebSocket socket = new WebSocket($"ws://{urlBase}/ws");
 
 		static string ID
 		{
@@ -42,51 +45,67 @@ namespace GorillaKZ
 			}
 		}
 
-		public static void OnJoinMap()
+		void Awake()
 		{
-			// Make sure we don't leave any open connections
-			if (socket != null && socket.IsAlive) socket.CloseAsync();
+			if (instance != null)
+			{
+				Destroy(this);
+			}
+			else
+			{
+				instance = this;
+			}
 
-			socket = new WebSocket($"ws://{urlBase}/ws");
-			socket.Connect();
+			GorillaKZManager.instance.OnGKZMapEnter += OnJoinMap;
+			GorillaKZManager.instance.OnGKZMapLeave += OnLeftMap;
+
 			socket.OnMessage += (sender, e) =>
 			{
 				UpdateLeaderboard(e.Data);
 			};
-			socket.Send(MapName + "\n" + ID);
 
 			Task.Run(SendPings);
 		}
 
-		public static void SendPings()
+		void OnJoinMap(object sender, GorillaKZManager.GKZData e) => Task.Run(OnJoinMap);
+		void OnJoinMap()
+		{
+			socket.Close();
+
+			socket.Connect();
+			socket.Send(MapName + "\n" + ID);
+		}
+
+		void SendPings()
 		{
 			while (true)
 			{
-				if (socket == null || !socket.IsAlive) return;
-				socket.Ping();
-				Thread.Sleep(60 * 1000);
+				if (socket != null && socket.IsAlive)
+				{
+					socket.Ping();
+				}
+				Thread.Sleep(45 * 1000);
 			}
 		}
 
-		public static void OnLeftMap()
+		void OnLeftMap(object sender, EventArgs e)
 		{
-			if (socket != null && socket.IsAlive) socket.CloseAsync();
-			socket = null;
+			socket.CloseAsync();
 		}
 
-		public static void SumbitRun(float time, FileInfo replay)
+		internal void SumbitRun(float time, FileInfo replay)
 		{
 			if (!(PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible)) return;
 
-			string key = ComputeSha256Hash(MapName + ID + time.ToString() + CheckpointManager.teleports.ToString() + Secrets.BackendKey);
-			Debug.Log($"Submitted run: runner:{GorillaKZManager.username} time:{time} map:{MapName} tp:{CheckpointManager.teleports} key:{key}");
+			string key = ComputeSha256Hash(MapName + ID + time.ToString() + CheckpointManager.instance.teleports.ToString() + Secrets.BackendKey);
+			Debug.Log($"Submitted run: runner:{GorillaKZManager.instance.Username} time:{time} map:{MapName} tp:{CheckpointManager.instance.teleports} key:{key}");
 			var body = new List<KeyValuePair<string, string>>
 			{
 				new KeyValuePair<string, string>("Map", MapName),
 				new KeyValuePair<string, string>("UUID", ID),
-				new KeyValuePair<string, string>("Name", GorillaKZManager.username),
+				new KeyValuePair<string, string>("Name", GorillaKZManager.instance.Username),
 				new KeyValuePair<string, string>("Time", time.ToString()),
-				new KeyValuePair<string, string>("TP", CheckpointManager.teleports.ToString()),
+				new KeyValuePair<string, string>("TP", CheckpointManager.instance.teleports.ToString()),
 				new KeyValuePair<string, string>("Key", key)
 			};
 
@@ -100,7 +119,7 @@ namespace GorillaKZ
 			});
 		}
 
-		static void SubmitReplay(string guid, FileInfo replay)
+		void SubmitReplay(string guid, FileInfo replay)
 		{
 			MultipartFormDataContent form = new MultipartFormDataContent()
 			{
@@ -109,7 +128,7 @@ namespace GorillaKZ
 			client.PostAsync($"http://{urlBase}/submittime/{guid}", form);
 		}
 
-		public static string ComputeSha256Hash(string rawData)
+		string ComputeSha256Hash(string rawData)
 		{
 			// Create a SHA256   
 			using (SHA256 sha256Hash = SHA256.Create())
@@ -146,14 +165,14 @@ namespace GorillaKZ
 			public float[] Times { get; set; }
 		}
 
-		static void UpdateLeaderboard(string data)
+		void UpdateLeaderboard(string data)
 		{
 			var res = JsonConvert.DeserializeObject<DataType>(data);
 
 			RunCollection topRuns = new RunCollection(1, res.TopRuns.Names.Select((x, i) => new Run(x, res.TopRuns.Times[i])).ToArray());
 			RunCollection localRuns = new RunCollection(res.LocalRuns.Offset + 1, res.LocalRuns.Names.Select((x, i) => new Run(x, res.LocalRuns.Times[i])).ToArray());
 
-			LeaderboardManager.UpdateLeaderboard(topRuns, localRuns);
+			LeaderboardManager.instance.UpdateLeaderboard(topRuns, localRuns);
 		}
 	}
 }

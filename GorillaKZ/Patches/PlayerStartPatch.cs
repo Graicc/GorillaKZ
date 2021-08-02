@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using GorillaKZ.Behaviours;
 using HarmonyLib;
 
 namespace GorillaKZ.Patches
 {
 
-    [HarmonyPatch(typeof(GorillaLocomotion.Player))]
+	[HarmonyPatch(typeof(GorillaLocomotion.Player))]
 	[HarmonyPatch("Awake", MethodType.Normal)]
 	internal class PlayerStartPatch
 	{

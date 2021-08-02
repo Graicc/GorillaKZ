@@ -1,15 +1,16 @@
-﻿using System;
+﻿using GorillaLocomotion;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using GorillaLocomotion;
 
-namespace GorillaKZ
+namespace GorillaKZ.Behaviours
 {
 	public class ReplayManager : MonoBehaviour
 	{
+		public static ReplayManager instance;
+
 		enum DataCode : byte
 		{
 			Left,
@@ -29,8 +30,20 @@ namespace GorillaKZ
 		bool lastL = false;
 		bool lastR = false;
 
-		public void Awake()
+		void Awake()
 		{
+			if (instance != null)
+			{
+				Destroy(this);
+			}
+			else
+			{
+				instance = this;
+			}
+
+			GorillaKZManager.instance.OnStartRun += StartRecording;
+			GorillaKZManager.instance.OnResetRun += ResetRecording;
+
 			int maxReplayCount = 100;
 
 			gkzDirectory = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GorillaKZ"));
@@ -46,7 +59,7 @@ namespace GorillaKZ
 			}
 		}
 
-		public void Update()
+		void Update()
 		{
 			if (recording)
 			{
@@ -77,7 +90,8 @@ namespace GorillaKZ
 			buffer.AddRange(BitConverter.GetBytes(pos.z));
 		}
 
-		public void StartRecording()
+		void StartRecording(object sender, EventArgs e) => StartRecording();
+		void StartRecording()
 		{
 			ResetRecording();
 
@@ -85,7 +99,8 @@ namespace GorillaKZ
 			recordingTime = 0;
 		}
 
-		public void ResetRecording()
+		void ResetRecording(object sender, EventArgs e) => ResetRecording();
+		void ResetRecording()
 		{
 			recording = false;
 			buffer = new List<byte>(170);

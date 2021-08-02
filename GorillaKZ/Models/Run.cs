@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace GorillaKZ
+namespace GorillaKZ.Models
 {
 	public class Run
 	{

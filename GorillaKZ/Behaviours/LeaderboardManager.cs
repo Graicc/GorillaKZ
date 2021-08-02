@@ -1,20 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GorillaKZ.Models;
+using System;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using VmodMonkeMapLoader;
 
-namespace GorillaKZ
+namespace GorillaKZ.Behaviours
 {
-	public static class LeaderboardManager
+	public class LeaderboardManager : MonoBehaviour
 	{
-		static AssetBundle leaderboardBundle;
-		static GameObject leaderboard;
-		static Text topTimesText;
-		static Text localTimesText;
+		public static LeaderboardManager instance;
 
-		public static void CreateLeaderboard(string parentName)
+		AssetBundle leaderboardBundle;
+		GameObject leaderboard;
+		Text topTimesText;
+		Text localTimesText;
+
+		void Awake()
+		{
+			if (instance != null)
+			{
+				Destroy(this);
+			}
+			else
+			{
+				instance = this;
+			}
+
+			GorillaKZManager.instance.OnGKZMapEnter += CreateLeaderboard;
+			GorillaKZManager.instance.OnGKZMapLeave += DestroyLeaderboard;
+		}
+
+		void CreateLeaderboard(object sender, GorillaKZManager.GKZData e)
 		{
 			if (leaderboardBundle == null)
 			{
@@ -22,9 +39,9 @@ namespace GorillaKZ
 				leaderboardBundle = AssetBundle.LoadFromFile(path);
 			}
 
-			leaderboard = UnityEngine.Object.Instantiate(leaderboardBundle.LoadAsset<GameObject>("Object"));
+			leaderboard = Instantiate(leaderboardBundle.LoadAsset<GameObject>("Object"));
 
-			Transform parentTransform = GameObject.Find(parentName).transform;
+			Transform parentTransform = GameObject.Find(e.leaderboard).transform;
 			leaderboard.transform.parent = parentTransform;
 			leaderboard.transform.localPosition = Vector3.zero;
 			leaderboard.transform.localEulerAngles = Vector3.zero;
@@ -39,12 +56,12 @@ namespace GorillaKZ
 		}
 
 		// Pretty sure this is useless, since it should be destroyed when the map is
-		public static void DestroyLeaderboard()
+		void DestroyLeaderboard(object sender, EventArgs e)
 		{
-			if (leaderboard != null) UnityEngine.Object.Destroy(leaderboard);
+			if (leaderboard != null) Destroy(leaderboard);
 		}
 
-		public static void UpdateLeaderboard(RunCollection top, RunCollection local)
+		public void UpdateLeaderboard(RunCollection top, RunCollection local)
 		{
 			StringBuilder topSB = new StringBuilder().AppendLine(Events.Descriptor.MapName.ToUpper());
 			topSB.Append(top.Render());

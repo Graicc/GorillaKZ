@@ -28,7 +28,6 @@ namespace GorillaKZ.Patches
 					playerRigidBody.velocity = Vector3.zero;
 					playerRigidBody.isKinematic = true;
 					__instance.transform.position = correctedPosition;
-					Debug.Log(__instance.bodyCollider.transform.position);
 
 					//__instance.transform.rotation = _teleportDestination.rotation;
 
