@@ -1,6 +1,4 @@
 ﻿using BepInEx;
-using GorillaKZ.Behaviours;
-using GorillaLocomotion;
 
 namespace GorillaKZ
 {
@@ -10,7 +8,6 @@ namespace GorillaKZ
 		void Awake()
 		{
 			HarmonyPatches.ApplyHarmonyPatches();
-			Player.Instance.gameObject.AddComponent<GorillaKZManager>();
 		}
 	}
 }

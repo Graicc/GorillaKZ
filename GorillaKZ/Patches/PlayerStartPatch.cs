@@ -3,7 +3,6 @@ using HarmonyLib;
 
 namespace GorillaKZ.Patches
 {
-
 	[HarmonyPatch(typeof(GorillaLocomotion.Player))]
 	[HarmonyPatch("Awake", MethodType.Normal)]
 	internal class PlayerStartPatch

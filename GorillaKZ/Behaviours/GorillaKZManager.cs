@@ -74,6 +74,8 @@ namespace GorillaKZ.Behaviours
 			if (enter)
 			{
 				var customData = Events.PackageInfo.Config.CustomData;
+				if (customData == null) return;
+
 				if (customData.TryGetValue("gamemode", out var gamemode) && gamemode as string == "GorillaKZ")
 				{
 					InGKZMap = true;

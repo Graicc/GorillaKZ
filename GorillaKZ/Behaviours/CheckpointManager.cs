@@ -137,9 +137,12 @@ namespace GorillaKZ.Behaviours
 			teleports = 0;
 			if (Events.Descriptor?.SpawnPoints != null)
 			{
-				var firstTeleport = Events.Descriptor.SpawnPoints[0];
-				checkpointsPos.Push(firstTeleport.position);
-				checkpointsRot.Push(firstTeleport.rotation.eulerAngles.y);
+				var firstTeleport = Events.Descriptor?.SpawnPoints?[0];
+				if (firstTeleport != null)
+				{
+					checkpointsPos.Push(firstTeleport.position);
+					checkpointsRot.Push(firstTeleport.rotation.eulerAngles.y);
+				}
 			}
 		}
 	}
