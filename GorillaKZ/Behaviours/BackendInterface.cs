@@ -93,7 +93,7 @@ namespace GorillaKZ.Behaviours
 			socket.CloseAsync();
 		}
 
-		internal void SumbitRun(float time, FileInfo replay)
+		internal void SumbitRun(RunTime time, FileInfo replay)
 		{
 			if (!(PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible)) return;
 

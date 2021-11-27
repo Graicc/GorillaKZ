@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using GorillaKZ.Models;
+using Photon.Pun;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -83,7 +84,7 @@ namespace GorillaKZ.Behaviours
 			text.text = "0:00.000";
 		}
 
-		public float StopTimer()
+		public RunTime StopTimer()
 		{
 			running = false;
 

@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using GorillaKZ.Models;
+using Photon.Pun;
 using System;
 using UnityEngine;
 using VmodMonkeMapLoader;
@@ -48,6 +49,7 @@ namespace GorillaKZ.Behaviours
 			Events.OnMapEnter += OnMapEnter;
 
 			CreateTimer();
+
 			gameObject.AddComponent<CheckpointManager>();
 			gameObject.AddComponent<LeaderboardManager>();
 			gameObject.AddComponent<BackendInterface>();
@@ -116,7 +118,7 @@ namespace GorillaKZ.Behaviours
 			if (running)
 			{
 				running = false;
-				float time = Timer.instance.StopTimer();
+				RunTime time = Timer.instance.StopTimer();
 
 				string fileName = Username + Events.Descriptor.MapName + time + DateTime.Now.ToString("-yyyy-dd-M-HH-mm-ss") + ".gtrec";
 				System.IO.FileInfo file = ReplayManager.instance.EndRecording(fileName);
