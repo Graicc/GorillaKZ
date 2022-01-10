@@ -112,11 +112,11 @@ namespace GorillaKZ.Behaviours
 				checkpointsPos.Push(t.position);
 				checkpointsRot.Push(t.eulerAngles.y);
 
-				GorillaTagger.Instance.myVRRig.PlayTagSound(1);
+				GorillaTagger.Instance.myVRRig.PlayTagSound(1, 1);
 			}
 			else
 			{
-				GorillaTagger.Instance.myVRRig.PlayTagSound(0);
+				GorillaTagger.Instance.myVRRig.PlayTagSound(0, 1);
 			}
 		}
 
