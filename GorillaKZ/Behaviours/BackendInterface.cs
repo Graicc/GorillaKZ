@@ -95,7 +95,7 @@ namespace GorillaKZ.Behaviours
 
 		internal void SumbitRun(RunTime time, FileInfo replay)
 		{
-			if (!(PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible)) return;
+			if (!(GorillaKZManager.IsValidRoom())) return;
 
 			string key = ComputeSha256Hash(MapName + ID + time.ToString() + CheckpointManager.instance.teleports.ToString() + Secrets.BackendKey);
 			Debug.Log($"Submitted run: runner:{GorillaKZManager.instance.Username} time:{time} map:{MapName} tp:{CheckpointManager.instance.teleports} key:{key}");

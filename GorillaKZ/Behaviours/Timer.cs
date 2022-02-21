@@ -42,7 +42,7 @@ namespace GorillaKZ.Behaviours
 
 		void Update()
 		{
-			if (GorillaKZManager.instance.ValidRun && PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible)
+			if (GorillaKZManager.instance.ValidRun && GorillaKZManager.IsValidRoom())
 			{
 				text.color = normalColor;
 			}

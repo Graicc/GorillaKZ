@@ -106,7 +106,7 @@ namespace GorillaKZ.Behaviours
 		{
 			if (!running)
 			{
-				ValidRun = PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible;
+				ValidRun = IsValidRoom();
 				OnStartRun?.Invoke(this, EventArgs.Empty);
 
 				running = true;
@@ -157,6 +157,20 @@ namespace GorillaKZ.Behaviours
 			{
 				StartRun();
 			}
+		}
+
+		public static bool IsValidRoom() {
+			bool valid = PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible;
+			if (valid) {
+				if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("gameMode", out var gamemodeObject))
+				{
+                    var gamemode = gamemodeObject as string;
+					if (gamemode?.Contains("MODDED") ?? true) {
+						valid = false;
+					}
+				}
+			}
+			return valid;
 		}
 	}
 }
