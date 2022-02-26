@@ -16,4 +16,4 @@ jobs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v1
     - name: Run
-      run: dotnet run --project AutoDocs -- README.md ${{ INFO_WEBHOOK }}
+      run: dotnet run --project AutoDocs -- README.md ${{ secrets.INFO_WEBHOOK }}
