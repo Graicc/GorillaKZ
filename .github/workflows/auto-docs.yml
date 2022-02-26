@@ -1,0 +1,19 @@
+name: Auto Docs
+on: 
+  workflow_dispatch:
+  push:
+    branches: [master,main,ci]
+    paths:
+      - '.github/workflows/auto-docs.yml'
+      - 'README.md'
+
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+    - name: Run
+      run: dotnet run --project AutoDocs -- README.md ${{ INFO_WEBHOOK }}
