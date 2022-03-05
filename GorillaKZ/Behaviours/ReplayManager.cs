@@ -73,7 +73,7 @@ namespace GorillaKZ.Behaviours
 				}
 				if (r && !lastR)
 				{
-					AddTouch(DataCode.Right, Player.Instance.leftHandTransform.position);
+					AddTouch(DataCode.Right, Player.Instance.rightHandTransform.position);
 				}
 
 				lastL = l;
