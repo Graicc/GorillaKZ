@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
+
+using static System.BitConverter;
 
 namespace GorillaKZ.Behaviours
 {
@@ -18,6 +21,10 @@ namespace GorillaKZ.Behaviours
 			Checkpoint,
 			Teleport
 		}
+
+		static readonly byte[] MagicBytes = { 0x47, 0x54 };
+		const ushort Version = 1;
+		const byte Platform = 0;
 
 		List<byte> buffer = new List<byte>(170);
 
@@ -81,13 +88,21 @@ namespace GorillaKZ.Behaviours
 			}
 		}
 
+		byte[] GetStringBytes(string s)
+		{
+			var bytes = Encoding.ASCII.GetBytes(s);
+			var finalBytes = new byte[bytes.Length + 1];
+			bytes.CopyTo(finalBytes, 0);
+			return finalBytes;
+		}
+
 		void AddTouch(DataCode code, Vector3 pos)
 		{
 			buffer.Add((byte)code);
-			buffer.AddRange(BitConverter.GetBytes(recordingTime));
-			buffer.AddRange(BitConverter.GetBytes(pos.x));
-			buffer.AddRange(BitConverter.GetBytes(pos.y));
-			buffer.AddRange(BitConverter.GetBytes(pos.z));
+			buffer.AddRange(GetBytes(recordingTime));
+			buffer.AddRange(GetBytes(pos.x));
+			buffer.AddRange(GetBytes(pos.y));
+			buffer.AddRange(GetBytes(pos.z));
 		}
 
 		void StartRecording(object sender, EventArgs e) => StartRecording();
@@ -97,6 +112,22 @@ namespace GorillaKZ.Behaviours
 
 			recording = true;
 			recordingTime = 0;
+
+			foreach(var b in MagicBytes)
+			{
+				buffer.Add(b);
+			}
+
+			buffer.AddRange(GetBytes(Version));
+
+			buffer.Add(Platform);
+
+			buffer.AddRange(GetStringBytes($"GKZv{PluginInfo.Version}"));
+
+			buffer.AddRange(GetStringBytes(VmodMonkeMapLoader.Events.MapName));
+
+			var mods = BepInEx.Bootstrap.Chainloader.PluginInfos.Select(x => x.Value.Metadata.GUID);
+			buffer.AddRange(GetStringBytes(string.Join(",", mods)));
 		}
 
 		void ResetRecording(object sender, EventArgs e) => ResetRecording();
