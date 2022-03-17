@@ -9,7 +9,7 @@ using UnityEngine;
 namespace GorillaKZ.Patches
 {
 	[HarmonyPatch(typeof(Player))]
-	[HarmonyPatch("Update", MethodType.Normal)]
+	[HarmonyPatch("LateUpdate", MethodType.Normal)]
 	internal class PlayerTeleportPatch
 	{
 		private static bool _isTeleporting = false;
