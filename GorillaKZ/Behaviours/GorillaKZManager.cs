@@ -170,7 +170,7 @@ namespace GorillaKZ.Behaviours
 			}
 
 			if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("gameMode", out var gamemodeObject)
-				&& (gamemodeObject as string)?.Contains("MODDED") ?? true)
+				&& ((gamemodeObject as string)?.Contains("MODDED") ?? true))
 			{
 				LeaderboardManager.instance.ShowMessage("Join a vanilla gamemode\nto start a run!", true);
 				return false;
