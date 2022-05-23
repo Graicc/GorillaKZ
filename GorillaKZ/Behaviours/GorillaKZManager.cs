@@ -163,7 +163,7 @@ namespace GorillaKZ.Behaviours
 		{
 			if (!PhotonNetwork.InRoom) return false;
 
-			if (PhotonNetwork.CurrentRoom.IsVisible)
+			if (!PhotonNetwork.CurrentRoom.IsVisible)
 			{
 				LeaderboardManager.instance.ShowMessage("Join a public room\nto start a run!", true);
 				return false;
