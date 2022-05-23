@@ -64,6 +64,22 @@ namespace GorillaKZ.Behaviours
 				UpdateLeaderboard(e.Data);
 			};
 
+			socket.OnClose += (sender, e) =>
+			{
+				Debug.Log($"[GKZ] Socket Closed with code {e.Code} and message {e.Reason}");
+				if (e.Code == 1007) // Protocol error
+				{
+					LeaderboardManager.instance.ShowMessage("Outdated version\nPlease update the mod", true);
+				}
+				else if (e.Code == 1002) // Connection closed
+				{
+					LeaderboardManager.instance.ShowMessage("Unofficial map", true);
+				} else
+				{
+					LeaderboardManager.instance.ShowMessage($"An unexpected error ({e.Code}) occured\nPlease try again later\n{e.Reason}", true);
+				}
+			};
+
 			Task.Run(SendPings);
 		}
 
@@ -72,8 +88,10 @@ namespace GorillaKZ.Behaviours
 		{
 			socket.Close();
 
+			LeaderboardManager.instance.ShowMessage($"{Events.Descriptor.MapName.ToUpper()}\nGETTING TIMES...");
+
 			socket.Connect();
-			socket.Send(MapName + "\n" + ID);
+			socket.Send(MapName + "\n" + ID + "\n" + PluginInfo.Version);
 		}
 
 		void SendPings()
@@ -93,11 +111,11 @@ namespace GorillaKZ.Behaviours
 			socket.CloseAsync();
 		}
 
-		internal void SumbitRun(RunTime time, FileInfo replay)
+		internal async void SumbitRun(RunTime time, FileInfo replay)
 		{
-			if (!(GorillaKZManager.IsValidRoom())) return;
+			if (!GorillaKZManager.IsValidRoom()) return;
 
-			string key = ComputeSha256Hash(MapName + ID + time.ToString() + CheckpointManager.instance.teleports.ToString() + Secrets.BackendKey);
+			string key = ComputeSha256Hash(MapName + ID + time.ToString() + CheckpointManager.instance.teleports.ToString() + PluginInfo.Version + Secrets.BackendKey);
 			Debug.Log($"Submitted run: runner:{GorillaKZManager.instance.Username} time:{time} map:{MapName} tp:{CheckpointManager.instance.teleports} key:{key}");
 			var body = new List<KeyValuePair<string, string>>
 			{
@@ -106,17 +124,16 @@ namespace GorillaKZ.Behaviours
 				new KeyValuePair<string, string>("Name", GorillaKZManager.instance.Username),
 				new KeyValuePair<string, string>("Time", time.ToString()),
 				new KeyValuePair<string, string>("TP", CheckpointManager.instance.teleports.ToString()),
+				new KeyValuePair<string, string>("Version", PluginInfo.Version),
 				new KeyValuePair<string, string>("Key", key)
 			};
 
-			Task.Run(() =>
+			HttpResponseMessage response = await client.PostAsync($"http://{urlBase}/submittime", new FormUrlEncodedContent(body));
+			string reply = await response.Content.ReadAsStringAsync();
+			if (reply != "")
 			{
-				string reply = client.PostAsync($"http://{urlBase}/submittime", new FormUrlEncodedContent(body)).Result.Content.ReadAsStringAsync().Result;
-				if (reply != "")
-				{
-					SubmitReplay(reply, replay);
-				}
-			});
+				SubmitReplay(reply, replay);
+			}
 		}
 
 		void SubmitReplay(string guid, FileInfo replay)

@@ -167,8 +167,12 @@ namespace GorillaKZ.Behaviours
                     var gamemode = gamemodeObject as string;
 					if (gamemode?.Contains("MODDED") ?? true) {
 						valid = false;
+						LeaderboardManager.instance.ShowMessage("Join a vanilla gamemode\nto start a run!", true);
 					}
 				}
+			} else
+			{
+				LeaderboardManager.instance.ShowMessage("Join a public room\nto start a run!", true);
 			}
 			return valid;
 		}

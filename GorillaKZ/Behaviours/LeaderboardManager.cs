@@ -16,6 +16,8 @@ namespace GorillaKZ.Behaviours
 		Text topTimesText;
 		Text localTimesText;
 
+		bool stickyMessage = false;
+
 		void Awake()
 		{
 			if (instance != null)
@@ -49,10 +51,7 @@ namespace GorillaKZ.Behaviours
 			topTimesText = leaderboard.transform.Find("Canvas/Global").GetComponent<Text>();
 			localTimesText = leaderboard.transform.Find("Canvas/Local").GetComponent<Text>();
 
-			StringBuilder topSB = new StringBuilder().AppendLine(Events.Descriptor.MapName.ToUpper());
-			topSB.AppendLine("GETTING TIMES...");
-			topTimesText.text = topSB.ToString();
-			localTimesText.text = "";
+			stickyMessage = false;
 		}
 
 		// Pretty sure this is useless, since it should be destroyed when the map is
@@ -63,6 +62,8 @@ namespace GorillaKZ.Behaviours
 
 		public void UpdateLeaderboard(RunCollection top, RunCollection local)
 		{
+			if (stickyMessage) return;
+
 			StringBuilder topSB = new StringBuilder().AppendLine(Events.Descriptor.MapName.ToUpper());
 			topSB.Append(top.Render());
 			topTimesText.text = topSB.ToString();
@@ -70,6 +71,16 @@ namespace GorillaKZ.Behaviours
 			StringBuilder localSB = new StringBuilder().AppendLine();
 			localSB.AppendLine(local.Render());
 			localTimesText.text = localSB.ToString();
+		}
+
+		public void ShowMessage(string message, bool sticky = false)
+		{
+			if (leaderboard == null) return;
+
+			topTimesText.text = message;
+			localTimesText.text = "";
+
+			stickyMessage = sticky;
 		}
 	}
 }
