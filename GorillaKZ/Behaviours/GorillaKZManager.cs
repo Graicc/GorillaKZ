@@ -159,22 +159,24 @@ namespace GorillaKZ.Behaviours
 			}
 		}
 
-		public static bool IsValidRoom() {
-			bool valid = PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.IsVisible;
-			if (valid) {
-				if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("gameMode", out var gamemodeObject))
-				{
-                    var gamemode = gamemodeObject as string;
-					if (gamemode?.Contains("MODDED") ?? true) {
-						valid = false;
-						LeaderboardManager.instance.ShowMessage("Join a vanilla gamemode\nto start a run!", true);
-					}
-				}
-			} else
+		public static bool IsValidRoom()
+		{
+			if (!PhotonNetwork.InRoom) return false;
+
+			if (PhotonNetwork.CurrentRoom.IsVisible)
 			{
 				LeaderboardManager.instance.ShowMessage("Join a public room\nto start a run!", true);
+				return false;
 			}
-			return valid;
+
+			if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("gameMode", out var gamemodeObject)
+				&& (gamemodeObject as string)?.Contains("MODDED") ?? true)
+			{
+				LeaderboardManager.instance.ShowMessage("Join a vanilla gamemode\nto start a run!", true);
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
