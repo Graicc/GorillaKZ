@@ -18,3 +18,6 @@ The primary button on your left controller (e.g. X) sets a checkpoint, the prima
 
 ## I made a map, how do I add GKZ support to it?
 The build tools to create GKZ compatible maps are not currently publicly available, sorry! Hopefully this will change in the future.
+
+## Disclaimers
+This product is not affiliated with Gorilla Tag or Another Axiom LLC and is not endorsed or otherwise sponsored by Another Axiom LLC. Portions of the materials contained herein are property of Another Axiom LLC. ©2021 Another Axiom LLC.
